@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { PairDetail } from "@/components/research/PairDetail";
 import { formatCompact, formatNumber, formatZ } from "@/lib/format";
 import type {
@@ -35,6 +35,23 @@ export function ResearchWorkbench() {
     });
     return list;
   }, [scan, sort]);
+
+  useEffect(() => {
+    if (!selected) return;
+    const mq = window.matchMedia("(min-width: 1024px)");
+    const apply = () => {
+      const lock = Boolean(selected) && !mq.matches;
+      document.documentElement.style.overflow = lock ? "hidden" : "";
+      document.body.style.overflow = lock ? "hidden" : "";
+    };
+    apply();
+    mq.addEventListener("change", apply);
+    return () => {
+      mq.removeEventListener("change", apply);
+      document.documentElement.style.overflow = "";
+      document.body.style.overflow = "";
+    };
+  }, [selected]);
 
   async function run(fresh = false) {
     setLoading(true);
@@ -308,8 +325,8 @@ export function ResearchWorkbench() {
       </div>
 
       {selected ? (
-        <div className="fixed inset-0 z-30 bg-ink/80 lg:static lg:z-auto lg:bg-transparent">
-          <div className="absolute inset-x-0 bottom-0 max-h-[92dvh] overflow-hidden rounded-t-2xl border-t border-line lg:static lg:max-h-none lg:rounded-none lg:border-0">
+        <div className="fixed inset-0 z-30 overflow-hidden overscroll-none bg-ink/80 lg:static lg:z-auto lg:overflow-visible lg:overscroll-auto lg:bg-transparent">
+          <div className="absolute inset-x-0 bottom-0 flex h-[92dvh] max-h-[92dvh] min-h-0 flex-col overflow-hidden rounded-t-2xl border-t border-line lg:static lg:h-auto lg:max-h-none lg:overflow-visible lg:rounded-none lg:border-0">
             <PairDetail
               key={`${selected.tickerA}-${selected.tickerB}`}
               pair={selected}

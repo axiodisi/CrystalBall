@@ -81,6 +81,21 @@ body {
   }
 }
 
+.pair-sheet-scroll {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (min-width: 1024px) {
+  .pair-sheet-scroll {
+    overflow: visible;
+    overscroll-behavior: auto;
+    touch-action: auto;
+  }
+}
+
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
