@@ -1,0 +1,91 @@
+@import "tailwindcss";
+
+:root {
+  --ink: #0a0e13;
+  --panel: #131a22;
+  --raised: #1a232d;
+  --line: #2a3644;
+  --fog: #8a97a8;
+  --paper: #e8eef4;
+  --amber: #e6a23c;
+  --cyan: #3eb8c4;
+  --rose: #c85a5a;
+  --sage: #6ba37a;
+}
+
+@theme inline {
+  --color-ink: var(--ink);
+  --color-panel: var(--panel);
+  --color-raised: var(--raised);
+  --color-line: var(--line);
+  --color-fog: var(--fog);
+  --color-paper: var(--paper);
+  --color-amber: var(--amber);
+  --color-cyan: var(--cyan);
+  --color-rose: var(--rose);
+  --color-sage: var(--sage);
+  --font-sans: var(--font-sora);
+  --font-mono: var(--font-ibm-plex-mono);
+}
+
+html {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+body {
+  min-height: 100dvh;
+  background:
+    radial-gradient(1200px 500px at 10% -10%, #16202b 0%, transparent 55%),
+    var(--ink);
+  color: var(--paper);
+  font-family: var(--font-sora), ui-sans-serif, system-ui, sans-serif;
+}
+
+::selection {
+  background: color-mix(in oklab, var(--amber) 40%, transparent);
+  color: var(--paper);
+}
+
+.tape-scan {
+  position: relative;
+  overflow: hidden;
+}
+
+.tape-scan::after {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 28%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in oklab, var(--amber) 55%, transparent),
+    transparent
+  );
+  animation: tape-sweep 7s linear infinite;
+}
+
+@keyframes tape-sweep {
+  from {
+    transform: translateX(-40%);
+  }
+  to {
+    transform: translateX(420%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tape-scan::after {
+    animation: none;
+  }
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
