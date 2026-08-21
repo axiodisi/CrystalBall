@@ -50,7 +50,7 @@ export function MiniChart({
   return (
     <svg
       viewBox={`0 0 ${width} ${height}`}
-      className={className}
+      className={`pointer-events-none ${className}`}
       aria-hidden="true"
     >
       {bands ? (

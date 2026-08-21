@@ -95,7 +95,7 @@ export function PairDetail({
         </button>
       </div>
 
-      <div className="pair-sheet-scroll min-h-0 flex-1 space-y-5 p-4">
+      <div className="sheet-scroll min-h-0 flex-1 space-y-5 p-4">
         <label className="block text-sm text-fog">
           Lookback (trading days)
           <input

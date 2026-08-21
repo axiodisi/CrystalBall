@@ -69,7 +69,7 @@ export function IndicatorCard({
           {open ? "Hide source & calculation" : "Source & calculation"}
         </button>
         {open ? (
-          <div className="space-y-2 pb-3 text-sm text-fog">
+          <div className="expand-scroll space-y-2 pb-3 text-sm text-fog">
             <p>
               <span className="text-paper">In general: </span>
               {indicator.interpretation}

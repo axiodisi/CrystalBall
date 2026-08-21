@@ -75,8 +75,8 @@ export function WatchDetail({
   const loading = loadedKey !== requestKey;
 
   return (
-    <section className="flex h-full flex-col border-line bg-panel lg:border-l">
-      <div className="flex items-start justify-between gap-3 border-b border-line p-4">
+    <section className="flex h-full min-h-0 flex-1 flex-col border-line bg-panel lg:border-l">
+      <div className="flex shrink-0 items-start justify-between gap-3 border-b border-line p-4">
         <div>
           <p className="font-mono text-[10px] tracking-[0.2em] text-amber uppercase">
             Live
@@ -98,7 +98,7 @@ export function WatchDetail({
         </button>
       </div>
 
-      <div className="flex-1 space-y-5 overflow-y-auto p-4">
+      <div className="sheet-scroll min-h-0 flex-1 space-y-5 p-4">
         <div className="flex items-center justify-between">
           <p className="font-mono text-3xl">
             {item?.z === null || item?.z === undefined ? "—" : formatZ(item.z)}
@@ -229,7 +229,7 @@ export function WatchDetail({
         </label>
       </div>
 
-      <div className="space-y-2 border-t border-line p-4">
+      <div className="shrink-0 space-y-2 border-t border-line p-4">
         <button
           type="button"
           onClick={onMute}

@@ -10,6 +10,7 @@ import { sortLive } from "@/lib/watchlist/evaluate";
 import { useWatchlist } from "@/lib/watchlist/store";
 import type { LiveItem } from "@/lib/watchlist/types";
 import { pairStatus } from "@/lib/watchlist/types";
+import { DetailSheet } from "@/components/shell/DetailSheet";
 import { AlertStrip } from "./AlertStrip";
 import { StatusBadge } from "./StatusBadge";
 import { WatchDetail } from "./WatchDetail";
@@ -156,22 +157,20 @@ export function WatchlistBoard() {
       </div>
 
       {selected ? (
-        <div className="fixed inset-0 z-30 bg-ink/80 lg:static lg:z-auto lg:bg-transparent">
-          <div className="absolute inset-x-0 bottom-0 max-h-[92dvh] overflow-hidden rounded-t-2xl border-t border-line lg:static lg:max-h-none lg:rounded-none lg:border-0">
-            <WatchDetail
-              pair={selected}
-              live={liveById.get(selected.id)}
-              muted={alerts.isMuted(selected.id)}
-              onClose={() => setSelectedId(null)}
-              onRemove={() => {
-                remove(selected.id);
-                setSelectedId(null);
-              }}
-              onMute={() => alerts.toggleMute(selected.id)}
-              onChange={(patch) => update(selected.id, patch)}
-            />
-          </div>
-        </div>
+        <DetailSheet>
+          <WatchDetail
+            pair={selected}
+            live={liveById.get(selected.id)}
+            muted={alerts.isMuted(selected.id)}
+            onClose={() => setSelectedId(null)}
+            onRemove={() => {
+              remove(selected.id);
+              setSelectedId(null);
+            }}
+            onMute={() => alerts.toggleMute(selected.id)}
+            onChange={(patch) => update(selected.id, patch)}
+          />
+        </DetailSheet>
       ) : (
         <div className="hidden rounded-xl border border-dashed border-line p-6 text-sm text-fog lg:block">
           Select a pair for charts and editable thresholds.

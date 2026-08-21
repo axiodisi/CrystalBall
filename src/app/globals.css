@@ -31,6 +31,7 @@
 html {
   background: var(--ink);
   color: var(--paper);
+  -webkit-overflow-scrolling: touch;
 }
 
 body {
@@ -81,15 +82,86 @@ body {
   }
 }
 
-.pair-sheet-scroll {
+/* Mobile detail sheets: one definite-height frame, one inner scrollport.
+   Parents must not use overflow:hidden — that steals iOS touch pan after
+   async content grows the inner height. */
+.sheet-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  background: color-mix(in oklab, var(--ink) 80%, transparent);
+}
+
+.sheet-frame {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: 0;
+  height: 92dvh;
+  max-height: 92dvh;
+  overflow: clip;
+  border-top: 1px solid var(--line);
+  border-top-left-radius: 1rem;
+  border-top-right-radius: 1rem;
+  background: var(--panel);
+}
+
+.sheet-frame > * {
+  display: flex;
+  flex: 1 1 0%;
+  flex-direction: column;
+  min-height: 0;
+  height: 100%;
+}
+
+.sheet-scroll {
+  flex: 1 1 0%;
+  min-height: 0;
+  max-height: 92dvh;
+  overflow-x: hidden;
   overflow-y: auto;
   overscroll-behavior: contain;
   touch-action: pan-y;
   -webkit-overflow-scrolling: touch;
 }
 
+.expand-scroll {
+  max-height: min(50dvh, 20rem);
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
 @media (min-width: 1024px) {
-  .pair-sheet-scroll {
+  .sheet-overlay {
+    position: static;
+    z-index: auto;
+    display: block;
+    background: transparent;
+  }
+
+  .sheet-frame {
+    height: auto;
+    max-height: none;
+    overflow: visible;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+  }
+
+  .sheet-frame > * {
+    flex: none;
+    height: auto;
+  }
+
+  .sheet-scroll,
+  .expand-scroll {
+    flex: none;
+    max-height: none;
     overflow: visible;
     overscroll-behavior: auto;
     touch-action: auto;
