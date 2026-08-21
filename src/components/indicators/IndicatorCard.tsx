@@ -7,6 +7,7 @@ import { readingHint } from "@/lib/indicators/copy";
 import { IconPin } from "@/components/shell/icons";
 import { Sparkline } from "./Sparkline";
 import { StressBadge } from "./StressBadge";
+import { VixMetrics } from "./VixMetrics";
 
 type IndicatorCardProps = {
   indicator: IndicatorSnapshot;
@@ -29,13 +30,19 @@ export function IndicatorCard({
             <h3 className="text-sm text-paper">{indicator.label}</h3>
             <StressBadge stress={indicator.stress} />
           </div>
-          <p className="mt-2 font-mono text-2xl tracking-tight text-paper">
-            {indicator.displayValue}
-          </p>
-          <p className="mt-1 font-mono text-xs text-fog">
-            {readingHint(indicator)}
-            {indicator.changeLabel ? `  ·  ${indicator.changeLabel}` : ""}
-          </p>
+          {indicator.id === "vix" ? (
+            <VixMetrics indicator={indicator} />
+          ) : (
+            <>
+              <p className="mt-2 font-mono text-2xl tracking-tight text-paper">
+                {indicator.displayValue}
+              </p>
+              <p className="mt-1 font-mono text-xs text-fog">
+                {readingHint(indicator)}
+                {indicator.changeLabel ? `  ·  ${indicator.changeLabel}` : ""}
+              </p>
+            </>
+          )}
           <p className="mt-3 text-sm leading-snug text-paper/90">
             {soWhat(indicator)}
           </p>

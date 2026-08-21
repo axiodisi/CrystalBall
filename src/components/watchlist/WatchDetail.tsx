@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { PairBrief } from "@/components/guidance/PairBrief";
 import { RecentComparison } from "@/components/guidance/RecentComparison";
 import { MiniChart } from "@/components/research/MiniChart";
+import { PairProfileLink } from "@/components/research/PairProfileLink";
 import { formatNumber, formatZ } from "@/lib/format";
 import type { PromotedPair } from "@/lib/research/types";
 import type { LiveItem, LiveResponse } from "@/lib/watchlist/types";
@@ -87,6 +88,11 @@ export function WatchDetail({
           <p className="text-sm text-fog">
             Stored β {formatNumber(pair.beta, 3)} · lookback {pair.lookbackDays}d
           </p>
+          <PairProfileLink
+            tickerA={pair.tickerA}
+            tickerB={pair.tickerB}
+            lookback={pair.lookbackDays}
+          />
         </div>
         <button
           type="button"

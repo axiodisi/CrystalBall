@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { PairBrief } from "@/components/guidance/PairBrief";
 import { RecentComparison } from "@/components/guidance/RecentComparison";
 import { MiniChart } from "@/components/research/MiniChart";
+import { PairProfileLink } from "@/components/research/PairProfileLink";
 import { formatNumber, formatSigned, formatZ } from "@/lib/format";
 import type { PairDetail as PairDetailData, PairSummary } from "@/lib/research/types";
 import { DEFAULT_ENTRY_Z, DEFAULT_EXIT_Z } from "@/lib/research/types";
@@ -84,6 +85,11 @@ export function PairDetail({
             log({stats.tickerA}) = {formatSigned(stats.alpha, 3)} +{" "}
             {formatNumber(stats.beta, 3)} · log({stats.tickerB})
           </p>
+          <PairProfileLink
+            tickerA={stats.tickerA}
+            tickerB={stats.tickerB}
+            lookback={lookback}
+          />
         </div>
         <button
           type="button"

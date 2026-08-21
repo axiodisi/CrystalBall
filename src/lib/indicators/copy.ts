@@ -31,9 +31,9 @@ export function readingHint(
       return tilt >= 0 ? "Broader participation" : "Mega-cap dominated";
     case "vix":
       if (item.stress === "unknown") return "No VIX reading";
-      if (item.stress === "elevated") return "High expected vol / fear";
-      if (item.stress === "watch") return "Vol picking up";
-      return "Low expected vol";
+      if (item.stress === "elevated") return "High expected daily swings";
+      if (item.stress === "watch") return "Expected daily swings picking up";
+      return "Low expected daily swings";
     case "gold":
       if (item.stress === "unknown") return "No gold reading";
       if (item.stress === "calm") return "Quiet safe-haven tape";

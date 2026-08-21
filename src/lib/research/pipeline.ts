@@ -20,6 +20,8 @@ import type {
   ScanParams,
   ScanResponse,
 } from "./types";
+import { lookupName } from "./profile";
+import { ScanTimeoutError, scanBudgetMs } from "./types";
 import { loadUniverse } from "./universe";
 
 const HALF_LIFE_MIN = 5;
@@ -135,8 +137,18 @@ function bestDirection(
   return ab ?? ba;
 }
 
+function assertScanBudget(started: number, budgetMs: number, universe: ScanParams["universe"]) {
+  if (Date.now() - started <= budgetMs) return;
+  throw new ScanTimeoutError(
+    universe === "sp500"
+      ? "Full S&P scan timed out. Try the liquid core (default) or a single sector."
+      : "Scan timed out. The last good results are unchanged.",
+  );
+}
+
 export async function runScan(params: ScanParams): Promise<ScanResponse> {
   const started = Date.now();
+  const budgetMs = scanBudgetMs(params.universe);
   const warnings: string[] = [];
   const { names, fallback } = await loadUniverse(params.universe, params.sector);
   if (fallback) {
@@ -145,7 +157,10 @@ export async function runScan(params: ScanParams): Promise<ScanResponse> {
     );
   }
 
+  assertScanBudget(started, budgetMs, params.universe);
+
   const quotes = await fetchHistories(names.map((item) => item.symbol));
+  assertScanBudget(started, budgetMs, params.universe);
   const eligible: Eligible[] = [];
   for (const name of names) {
     const quote = quotes[name.symbol];
@@ -162,6 +177,7 @@ export async function runScan(params: ScanParams): Promise<ScanResponse> {
   }> = [];
 
   for (let i = 0; i < eligible.length; i += 1) {
+    if (i % 8 === 0) assertScanBudget(started, budgetMs, params.universe);
     for (let j = i + 1; j < eligible.length; j += 1) {
       const aligned = sliceLast(
         alignPair(eligible[i].quote.points, eligible[j].quote.points),
@@ -190,7 +206,9 @@ export async function runScan(params: ScanParams): Promise<ScanResponse> {
   }
 
   const results: PairSummary[] = [];
-  for (const hit of screened) {
+  for (let i = 0; i < screened.length; i += 1) {
+    if (i % 4 === 0) assertScanBudget(started, budgetMs, params.universe);
+    const hit = screened[i];
     const pair = bestDirection(hit.a, hit.b, params.estLookback);
     if (pair) {
       pair.correlation = hit.corr;
@@ -227,13 +245,13 @@ export async function describePair(
   const left: Eligible = {
     symbol: tickerA,
     name: quoteA.name,
-    sector: "",
+    sector: lookupName(tickerA).sector,
     quote: quoteA,
   };
   const right: Eligible = {
     symbol: tickerB,
     name: quoteB.name,
-    sector: "",
+    sector: lookupName(tickerB).sector,
     quote: quoteB,
   };
   const summary = diagnose(left, right, lookback, false);

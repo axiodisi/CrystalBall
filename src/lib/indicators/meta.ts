@@ -48,11 +48,12 @@ export const INDICATOR_META: Record<string, IndicatorMeta> = {
     shortLabel: "VIX",
     category: "volatility",
     source: "Yahoo Finance / Stooq fallback (^VIX)",
-    calculation: "Index level with 1-day and 5-day change.",
+    calculation:
+      "VIX level (annualized implied vol, not an equity return). Implied daily S&P move ≈ VIX / 16. The 5-day figure is the change in the VIX index itself — not an S&P 5-day return.",
     frequency: "EOD + ~15 min refresh during market hours",
     interpretation:
-      "Elevated VIX signals higher expected equity volatility / fear.",
-    glance: "Higher = more expected equity fear",
+      "Elevated VIX means options are pricing larger typical daily S&P swings (roughly VIX ÷ 16). A big 5-day VIX move is the vol index changing, not the stock market crashing by that percent.",
+    glance: "Level + implied daily S&P move (VIX/16). 5d is VIX, not S&P",
     defaultPinned: true,
   },
   gold: {

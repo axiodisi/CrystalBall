@@ -1,5 +1,22 @@
 export type UniverseMode = "liquid" | "sp500";
 
+export class ScanTimeoutError extends Error {
+  readonly timedOut = true as const;
+
+  constructor(message: string) {
+    super(message);
+    this.name = "ScanTimeoutError";
+  }
+}
+
+export function scanBudgetMs(universe: UniverseMode): number {
+  return universe === "sp500" ? 90_000 : 45_000;
+}
+
+export function scanClientTimeoutMs(universe: UniverseMode): number {
+  return universe === "sp500" ? 100_000 : 55_000;
+}
+
 export type ScanParams = {
   universe: UniverseMode;
   sector: string;

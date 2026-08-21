@@ -1,4 +1,5 @@
 import type { IndicatorSnapshot, IndicatorsPayload } from "@/lib/data/types";
+import { formatImpliedDailyMove } from "@/lib/indicators/vix";
 import { classifyRegime } from "./regime";
 import type { MarketSnapshot, Regime, RegimeReading } from "./types";
 
@@ -8,13 +9,17 @@ function byId(indicators: IndicatorSnapshot[], id: string) {
 
 function vixClause(vix: IndicatorSnapshot | undefined): string {
   if (!vix || vix.stress === "unknown") return "VIX is unavailable";
+  const implied =
+    vix.value !== null && Number.isFinite(vix.value)
+      ? `, ${formatImpliedDailyMove(vix.value)}`
+      : "";
   if (vix.stress === "elevated") {
-    return `expected stock swings are high (VIX ${vix.displayValue})`;
+    return `expected stock swings are high (VIX level ${vix.displayValue}${implied})`;
   }
   if (vix.stress === "watch") {
-    return `expected stock swings are picking up (VIX ${vix.displayValue})`;
+    return `expected stock swings are picking up (VIX level ${vix.displayValue}${implied})`;
   }
-  return `expected stock swings are low (VIX ${vix.displayValue})`;
+  return `expected stock swings are low (VIX level ${vix.displayValue}${implied})`;
 }
 
 function otherFlags(indicators: IndicatorSnapshot[]): string[] {

@@ -32,6 +32,10 @@ export type IndicatorSnapshot = {
   displayValue: string;
   changeLabel: string;
   changePct: number | null;
+  /** 5-session change of this series (VIX index, gold, DXY) — never an S&P return. */
+  change5dPct?: number | null;
+  /** VIX only: level / 16 ≈ typical 1-session S&P move. */
+  impliedDailyPct?: number | null;
   zScore: number | null;
   sparkline: number[];
   stress: StressLevel;

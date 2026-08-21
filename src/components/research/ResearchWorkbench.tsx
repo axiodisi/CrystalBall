@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, type ReactNode } from "react";
+import { useMemo, useRef, useState, type ReactNode } from "react";
 import { PairDetail } from "@/components/research/PairDetail";
 import { DetailSheet } from "@/components/shell/DetailSheet";
 import { formatCompact, formatNumber, formatZ } from "@/lib/format";
@@ -9,7 +9,7 @@ import type {
   ScanParams,
   ScanResponse,
 } from "@/lib/research/types";
-import { DEFAULT_SCAN } from "@/lib/research/types";
+import { DEFAULT_SCAN, scanClientTimeoutMs } from "@/lib/research/types";
 import { SECTORS } from "@/lib/research/universe";
 import { useWatchlist } from "@/lib/watchlist/store";
 
@@ -25,6 +25,7 @@ export function ResearchWorkbench() {
   const [selected, setSelected] = useState<PairSummary | null>(null);
   const [banner, setBanner] = useState<string | null>(null);
   const watchlist = useWatchlist();
+  const abortRef = useRef<AbortController | null>(null);
 
   const rows = useMemo(() => {
     const list = [...(scan?.results ?? [])];
@@ -38,6 +39,14 @@ export function ResearchWorkbench() {
   }, [scan, sort]);
 
   async function run(fresh = false) {
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+    const timer = window.setTimeout(
+      () => controller.abort(),
+      scanClientTimeoutMs(params.universe),
+    );
+
     setLoading(true);
     setError(null);
     setBanner(null);
@@ -48,16 +57,51 @@ export function ResearchWorkbench() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(params),
+          signal: controller.signal,
         },
       );
-      if (!response.ok) throw new Error(`Scan failed (${response.status})`);
-      const json = (await response.json()) as ScanResponse;
+      let json: (ScanResponse & { error?: string }) | null = null;
+      try {
+        json = (await response.json()) as ScanResponse & { error?: string };
+      } catch {
+        json = null;
+      }
+      if (!response.ok || !json || !Array.isArray(json.results)) {
+        const keep = scan ? " Last good results are still shown." : "";
+        throw new Error(
+          (json?.error ??
+            (params.universe === "sp500"
+              ? `Full S&P scan failed (${response.status || "network"}).`
+              : `Scan failed (${response.status || "network"}).`)) + keep,
+        );
+      }
       setScan(json);
       setSelected(json.results[0] ?? null);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Scan failed");
+      if (controller.signal.aborted && abortRef.current !== controller) {
+        return;
+      }
+      const timedOut =
+        (err instanceof DOMException && err.name === "AbortError") ||
+        (err instanceof Error && err.name === "AbortError");
+      const keepNote = scan ? " Last good results are still shown." : "";
+      const timeoutMsg =
+        params.universe === "sp500"
+          ? `Full S&P scan timed out.${keepNote} Try liquid core or a sector filter.`
+          : `Scan timed out.${keepNote}`;
+      setError(
+        timedOut
+          ? timeoutMsg
+          : err instanceof Error
+            ? err.message
+            : `Scan failed.${keepNote}`,
+      );
     } finally {
-      setLoading(false);
+      window.clearTimeout(timer);
+      if (abortRef.current === controller) {
+        abortRef.current = null;
+        setLoading(false);
+      }
     }
   }
 
@@ -100,8 +144,8 @@ export function ResearchWorkbench() {
                   }
                   className="w-full rounded-md border border-line bg-ink px-3 py-2 text-sm text-paper"
                 >
-                  <option value="liquid">Liquid core (~110 names)</option>
-                  <option value="sp500">Full S&P 500 (slower)</option>
+                  <option value="liquid">Liquid core (~110 names) — default</option>
+                  <option value="sp500">Full S&P 500 (optional, can time out)</option>
                 </select>
               </Field>
               <Field label="Sector">
@@ -205,15 +249,25 @@ export function ResearchWorkbench() {
                   {loading ? "Running pipeline…" : "Run scan"}
                 </button>
                 <p className="mt-2 text-xs text-fog">
-                  Default is a liquid S&P subset so the first run stays usable.
-                  Full S&P 500 can take up to about a minute.
+                  Default is the liquid core so the first run stays usable. Full
+                  S&P 500 is optional and can time out — if it dies, this screen
+                  stays up and the last good results remain.
                 </p>
               </div>
             </div>
           ) : null}
         </section>
 
-        {error ? <p className="text-sm text-rose">{error}</p> : null}
+        {error ? (
+          <p className="rounded-xl border border-rose/40 bg-rose/10 px-4 py-3 text-sm text-rose">
+            {error}
+          </p>
+        ) : null}
+        {loading && scan ? (
+          <p className="text-sm text-fog">
+            Running a new scan — previous results stay until this finishes.
+          </p>
+        ) : null}
         {banner ? <p className="text-sm text-sage">{banner}</p> : null}
 
         {scan ? (

@@ -1,5 +1,6 @@
 import { formatNumber, formatPct, formatZ } from "@/lib/format";
 import { INDICATOR_META, PIZZA_META } from "@/lib/indicators/meta";
+import { impliedDailyMovePct } from "@/lib/indicators/vix";
 import { withCache } from "./cache";
 import { fetchPolymarketCards } from "./polymarket";
 import {
@@ -32,6 +33,8 @@ function unavailable(
     displayValue: "—",
     changeLabel: reason,
     changePct: null,
+    change5dPct: null,
+    impliedDailyPct: meta.id === "vix" ? null : undefined,
     zScore: null,
     sparkline: [],
     stress: "unknown",
@@ -106,6 +109,10 @@ function buildLevel(
   const weekAgo = quote.points.at(-6)?.v;
   const dayPct = pctChange(last, prev);
   const weekPct = weekAgo ? pctChange(last, weekAgo) : null;
+  const vixFiveDay =
+    weekPct !== null
+      ? `VIX 5d ${formatPct(weekPct)} (VIX index, not S&P)`
+      : "VIX 5d unavailable";
   const changeBits = [formatPct(dayPct)];
   if (weekPct !== null) changeBits.push(`5d ${formatPct(weekPct)}`);
 
@@ -116,8 +123,10 @@ function buildLevel(
     category: meta.category,
     value: last,
     displayValue: formatNumber(last, digits),
-    changeLabel: changeBits.join("  ·  "),
+    changeLabel: id === "vix" ? vixFiveDay : changeBits.join("  ·  "),
     changePct: dayPct,
+    change5dPct: weekPct,
+    impliedDailyPct: id === "vix" ? impliedDailyMovePct(last) : undefined,
     zScore: id === "vix" ? lastZScore(quote.points.map((p) => p.v), 20) : null,
     sparkline: sparklineValues(quote.points),
     stress:

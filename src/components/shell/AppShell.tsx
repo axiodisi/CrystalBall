@@ -74,8 +74,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 CrystalBall
               </p>
               <p className="text-sm text-fog">
-                {NAV_ITEMS.find((item) => isActive(pathname, item.href))?.label ??
-                  "Command"}
+                {pathname.startsWith("/pair/")
+                  ? "Pair profile"
+                  : (NAV_ITEMS.find((item) => isActive(pathname, item.href))
+                      ?.label ?? "Command")}
               </p>
             </div>
             <span className="font-mono text-[10px] tracking-widest text-fog uppercase">

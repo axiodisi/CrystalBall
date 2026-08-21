@@ -99,18 +99,18 @@ function soWhatBody(item: IndicatorSnapshot): { now: string; pair: string } {
       }
       if (item.stress === "elevated") {
         return {
-          now: `Expected stock swings are high (VIX ${item.displayValue}) — fear is up.`,
+          now: `VIX level ${item.displayValue} — expected stock swings are high. That is a vol reading, not a 5-day S&P crash figure.`,
           pair: "Unusual pair gaps are less trustworthy while this lasts.",
         };
       }
       if (item.stress === "watch") {
         return {
-          now: `Expected stock swings are picking up (VIX ${item.displayValue}).`,
+          now: `VIX level ${item.displayValue} — expected stock swings are picking up.`,
           pair: "Unusual pair gaps can still shrink — wait until the gap starts coming back, not the first stretch.",
         };
       }
       return {
-        now: `Expected stock swings are low (VIX ${item.displayValue}).`,
+        now: `VIX level ${item.displayValue} — expected stock swings are low.`,
         pair: "Friendlier backdrop for unusual pair gaps shrinking.",
       };
 

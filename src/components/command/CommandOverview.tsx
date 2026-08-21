@@ -7,6 +7,7 @@ import { PromotedSnapshot } from "@/components/command/PromotedSnapshot";
 import { PolymarketCard } from "@/components/indicators/PolymarketCard";
 import { Sparkline } from "@/components/indicators/Sparkline";
 import { StressBadge } from "@/components/indicators/StressBadge";
+import { VixMetrics } from "@/components/indicators/VixMetrics";
 import type { IndicatorsPayload } from "@/lib/data/types";
 import { formatClock } from "@/lib/format";
 import { readingHint } from "@/lib/indicators/copy";
@@ -77,11 +78,19 @@ export function CommandOverview({ data }: CommandOverviewProps) {
                 <p className="text-xs text-fog">{item.shortLabel}</p>
                 <StressBadge stress={item.stress} />
               </div>
-              <p className="mt-2 font-mono text-xl text-paper">{item.displayValue}</p>
-              <p className="mt-1 font-mono text-[11px] text-fog">
-                {readingHint(item)}
-                {item.changeLabel ? `  ·  ${item.changeLabel}` : ""}
-              </p>
+              {item.id === "vix" ? (
+                <VixMetrics indicator={item} compact />
+              ) : (
+                <>
+                  <p className="mt-2 font-mono text-xl text-paper">
+                    {item.displayValue}
+                  </p>
+                  <p className="mt-1 font-mono text-[11px] text-fog">
+                    {readingHint(item)}
+                    {item.changeLabel ? `  ·  ${item.changeLabel}` : ""}
+                  </p>
+                </>
+              )}
               <p className="mt-2 text-xs leading-snug text-fog">
                 {soWhat(item, true)}
               </p>
